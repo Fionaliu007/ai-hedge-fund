@@ -1,4 +1,6 @@
 from typing import Any
+
+
 class Cache:
     """In-memory cache for API responses."""
 
@@ -22,13 +24,18 @@ class Cache:
         merged.extend([item for item in new_data if item[key_field] not in existing_keys])
         return merged
 
-    def get_prices(self, ticker: str) -> list[dict[str, Any]] | None:
-        """Get cached price data if available."""
-        return self._prices_cache.get(ticker)
+    def _cache_key(self, ticker: str, asset_class: str) -> str:
+        """Build cache key for price data."""
+        return f"{asset_class}:{ticker}"
 
-    def set_prices(self, ticker: str, data: list[dict[str, Any]]):
+    def get_prices(self, ticker: str, asset_class: str = "equity") -> list[dict[str, Any]] | None:
+        """Get cached price data if available."""
+        return self._prices_cache.get(self._cache_key(ticker, asset_class))
+
+    def set_prices(self, ticker: str, data: list[dict[str, Any]], asset_class: str = "equity"):
         """Append new price data to cache."""
-        self._prices_cache[ticker] = self._merge_data(self._prices_cache.get(ticker), data, key_field="time")
+        key = self._cache_key(ticker, asset_class)
+        self._prices_cache[key] = self._merge_data(self._prices_cache.get(key), data, key_field="time")
 
     def get_financial_metrics(self, ticker: str) -> list[dict[str, Any]] | None:
         """Get cached financial metrics if available."""
