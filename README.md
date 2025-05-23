@@ -40,6 +40,16 @@ This project is for **educational and research purposes only**.
 
 By using this software, you agree to use it solely for learning purposes.
 
+## Features
+
+- Support for multiple asset classes including stocks, cryptocurrencies,
+  foreign exchange and commodities via a unified API.
+- Advanced risk management with position limits, value-at-risk and
+  drawdown metrics.
+- Modular agents for valuation, fundamentals, technicals and sentiment
+  analysis.
+- Backtesting utilities and portfolio management tools.
+
 ## Table of Contents
 - [Setup](#setup)
   - [Using Poetry](#using-poetry)

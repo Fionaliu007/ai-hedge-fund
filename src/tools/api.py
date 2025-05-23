@@ -22,10 +22,27 @@ from src.data.models import (
 _cache = get_cache()
 
 
-def get_prices(ticker: str, start_date: str, end_date: str) -> list[Price]:
-    """Fetch price data from cache or API."""
+def get_prices(
+    ticker: str,
+    start_date: str,
+    end_date: str,
+    asset_class: str = "equity",
+) -> list[Price]:
+    """Fetch price data from cache or API for different asset classes.
+
+    Parameters
+    ----------
+    ticker: str
+        Symbol of the instrument.
+    start_date: str
+        Start date for price history.
+    end_date: str
+        End date for price history.
+    asset_class: str, optional
+        Asset class such as "equity", "crypto", "fx", or "commodity". Defaults to "equity".
+    """
     # Check cache first
-    if cached_data := _cache.get_prices(ticker):
+    if cached_data := _cache.get_prices(ticker, asset_class=asset_class):
         # Filter cached data by date range and convert to Price objects
         filtered_data = [Price(**price) for price in cached_data if start_date <= price["time"] <= end_date]
         if filtered_data:
@@ -37,6 +54,8 @@ def get_prices(ticker: str, start_date: str, end_date: str) -> list[Price]:
         headers["X-API-KEY"] = api_key
 
     url = f"https://api.financialdatasets.ai/prices/?ticker={ticker}&interval=day&interval_multiplier=1&start_date={start_date}&end_date={end_date}"
+    if asset_class != "equity":
+        url += f"&asset_class={asset_class}"
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
         raise Exception(f"Error fetching data: {ticker} - {response.status_code} - {response.text}")
@@ -49,7 +68,7 @@ def get_prices(ticker: str, start_date: str, end_date: str) -> list[Price]:
         return []
 
     # Cache the results as dicts
-    _cache.set_prices(ticker, [p.model_dump() for p in prices])
+    _cache.set_prices(ticker, [p.model_dump() for p in prices], asset_class=asset_class)
     return prices
 
 
@@ -102,13 +121,7 @@ def search_line_items(
 
     # Check cache first
     if cached_data := _cache.get_line_items(ticker):
-        filtered_data = [
-            LineItem(**item)
-            for item in cached_data
-            if item["report_period"] <= end_date
-            and item["period"] == period
-            and all(li in item for li in line_items)
-        ]
+        filtered_data = [LineItem(**item) for item in cached_data if item["report_period"] <= end_date and item["period"] == period and all(li in item for li in line_items)]
         filtered_data.sort(key=lambda x: x.report_period, reverse=True)
         if filtered_data:
             return filtered_data[:limit]
@@ -310,6 +323,6 @@ def prices_to_df(prices: list[Price]) -> pd.DataFrame:
 
 
 # Update the get_price_data function to use the new functions
-def get_price_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
-    prices = get_prices(ticker, start_date, end_date)
+def get_price_data(ticker: str, start_date: str, end_date: str, asset_class: str = "equity") -> pd.DataFrame:
+    prices = get_prices(ticker, start_date, end_date, asset_class=asset_class)
     return prices_to_df(prices)
