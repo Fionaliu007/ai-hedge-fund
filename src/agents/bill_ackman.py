@@ -5,6 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 import json
+from typing import Any
 from typing_extensions import Literal
 from src.utils.progress import progress
 from src.utils.llm import call_llm
@@ -397,7 +398,7 @@ def analyze_valuation(financial_line_items: list, market_cap: float) -> dict:
 
 def generate_ackman_output(
     ticker: str,
-    analysis_data: dict[str, any],
+    analysis_data: dict[str, Any],
     model_name: str,
     model_provider: str,
 ) -> BillAckmanSignal:

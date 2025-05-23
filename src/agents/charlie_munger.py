@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 import json
 from typing_extensions import Literal
+from typing import Any
 from src.utils.progress import progress
 from src.utils.llm import call_llm
 
@@ -663,7 +664,7 @@ def analyze_news_sentiment(news_items: list) -> str:
 
 def generate_munger_output(
     ticker: str,
-    analysis_data: dict[str, any],
+    analysis_data: dict[str, Any],
     model_name: str,
     model_provider: str,
 ) -> CharlieMungerSignal:
