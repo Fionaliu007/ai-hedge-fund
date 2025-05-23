@@ -12,6 +12,7 @@ from pydantic import BaseModel
 import json
 from typing_extensions import Literal
 from src.utils.progress import progress
+from typing import Any
 from src.utils.llm import call_llm
 import statistics
 
@@ -529,7 +530,7 @@ def analyze_sentiment(news_items: list) -> dict:
 
 def generate_fisher_output(
     ticker: str,
-    analysis_data: dict[str, any],
+    analysis_data: dict[str, Any],
     model_name: str,
     model_provider: str,
 ) -> PhilFisherSignal:
